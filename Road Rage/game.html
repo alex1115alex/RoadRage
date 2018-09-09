@@ -1,0 +1,531 @@
+<html>
+
+<head>
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Sigmar+One);
+        * {
+            font-family: 'Sigmar One', cursive;
+        }
+
+        body{
+	transform-origin: 0 0;
+	position: fixed;
+	}
+
+        #car {
+            height: 100px;
+            width: 200px;
+            position: absolute;
+	top: 0px;
+            top: 300px;
+            left: 50px;
+            background-image: url("car.png");
+        }
+        
+        #dodge1 {
+            height: 100px;
+            width: 50px;
+            position: absolute;
+	top: 0px;
+            background-image: url("joshman.gif");
+            background-size: cover;
+        }
+        
+        #dodge2 {
+            height: 100px;
+            width: 50px;
+            position: absolute;
+		top: 0px;
+            background-image: url("joshman.gif");
+            background-size: cover;
+        }
+        
+        #road {
+            width: 1000px;
+            height: 600px;
+            overflow: hidden;
+        }
+        
+        #roadimg {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #speedBox {
+            z-index: 10;
+            position: absolute;
+            background-color: #64B058;
+            height: 35px;
+            width: 50px;
+            float: right;
+        }
+        
+	#fuelBox {
+            z-index: 10;
+            position: absolute;
+		left: 500px;
+            background-color: #64B058;
+            height: 35px;
+            width: 50px;
+            float: right;
+        }
+
+        #startButton {
+            height: 70px;
+            width: 120px;
+            border-radius: 15px;
+            border-style: solid;
+            border-color: #000;
+            border-width: 1px;
+            background-color: #92D18B;
+        }
+	#title{
+	height: 600;
+	width: 1000;
+	z-index: 100;
+	background-color: #FFF056;
+	position: absolute;
+	
+	}
+	#titleText{
+	position: absolute;
+ 	 top: 50%;
+  	left: 50%;
+  	transform: translate(-50%, -50%);
+	text-align: center;	
+	}
+	#scoreInput{
+	display: none;
+	}
+	#scoreSubmitButton{
+	 	height: 60px;
+            width: 110px;
+            border-radius: 15px;
+            border-style: solid;
+            border-color: #000;
+            border-width: 1px;
+            background-color: #92D18B;
+		margin: 0 auto;
+	}
+	#nameInput{
+            border-radius: 15px;
+            border-style: solid;
+            border-color: #000;
+            border-width: 1px;
+	margin: 15 auto;
+	}
+
+	#viewScoreButton{
+            border-radius: 15px;
+            border-style: solid;
+            border-color: #000;
+            border-width: 1px;
+            background-color: #92D18B;
+	}
+
+    </style>
+</head>
+
+<body>
+
+	<div id="title">
+		<div id="titleText">
+			
+			<h1 id="message">Bollweg Road Rage</h1>
+			<center><button id="startButton" onClick="start()">Start!</button></center>
+			
+			<h3>Z to accelerate, Up and Down arrow keys to move</h3>
+			<h5><a href="mobile.html">Mobile version</a></h5>
+				
+				<div id="submitScoreDiv">
+					<button id="viewScoreButton" onClick="openScore()">View High Score</button>
+					<form action="score.php" method="post" target="theTarget" onSubmit="window.open('', 'theTarget', 'width=450,height=300,status=no,resizable=no,scrollbars=no')" >
+  					  <input type="text" name="scoreInput" id="scoreInput" value="Name"></input>
+					<input name="nameInput" id="nameInput"></input>
+						<button id="scoreSubmitButton" type="submit" value="Submit">Submit Score</button>
+					</form>	
+				</div>			
+
+		</div>
+		<button id="fullscreenButton" onClick="fullscreen()">Fullscreen</button>
+	</div>
+    <div id="road">
+        <div id="speedBox"></div>
+	<div id="fuelBox">fuel</div>
+        <img id="roadimg" src="road.png">
+    </div>
+    
+	<audio id="scream" width="0" height="0">
+  	<source src="scream.mp3">
+	</audio>
+
+	<audio id="carSound" width="0" height="0">
+  	<source src="car.mp3">
+	</audio>
+
+
+    <div id="car"></div>
+    <div id="dodge1"></div>
+    <div id="dodge2"></div>
+
+    <script>
+	
+	function setGame(){
+	
+	
+	playing = 0;
+	speed = 0;
+	speedUp = 0;
+	cary = 300;
+	carx = 50;
+	dodge1x = 1000;
+	dodge1y = 300;
+	dodge2x = 2000;
+	dodge2y = 300;
+	fuel = 0;
+	roadx = 0;
+	dodge1hit = 0;
+	dodge2hit = 0;
+	gameEnding = 0;
+	enemiesHit = 0;
+	maxSpeed = 20;
+	title.style.display = "block";
+	}
+	
+	document.getElementById("nameInput").style.display = "none";
+	document.getElementById("scoreSubmitButton").style.display = "none";
+        var score = 0;
+        var playing = 0;
+	var enemiesHit = 0;
+	var gameEnding = 0;
+        var speed = 0;
+        var speedUp = 0;
+        var cary = 300;
+        var carx = 50;
+        var moveDown = 0;
+        var moveUp = 0;
+	var fuel = 0;
+	var fuelBox = document.getElementById("fuelBox");
+        var car = document.getElementById("car");
+        var roadx = 0;
+        var roadimage = document.getElementById("roadimg");
+        var speedBox = document.getElementById("speedBox");
+        var dodge1hit = 0;
+        var dodge2hit = 0;
+	var title = document.getElementById("title");
+	var message = document.getElementById("message");
+	title.style.display = "block";
+	var maxSpeed = 20;
+        var dodge1 = document.getElementById("dodge1");
+        var dodge1y = 300;
+        var dodge1x = 1000;
+
+        var dodge2 = document.getElementById("dodge2");
+        var dodge2y = 300;
+        var dodge2x = 2000;
+
+        dodge1.style.display = "none";
+        dodge2.style.display = "none";
+
+	fuelDrain();
+	roadfunction();
+        info();
+        enemies();
+        carMove();
+	
+	document.getElementById("scoreInput").value = score;
+	var scream = document.getElementById("scream"); 
+	var carSound = document.getElementById("carSound"); 
+	carSound.volume = .08;
+	var playerScored = 0;
+	
+	var w = window.innerWidth;
+	var h = window.innerHeight;
+	var adjustedWidth = w / 1000;
+	var adjustedHeight = h / 600;
+	
+	function fullscreen(){
+	document.body.style.transform = "scale("+adjustedWidth+","+adjustedHeight+"2)";
+	}
+
+	function openScore(){
+	window.open('score.php', '', 'width=450,height=300,status=no,resizable=no,scrollbars=no')
+	}
+		
+	function endGame(){
+	message.innerHTML = "Grats! You scored " + score + " points!";
+	document.getElementById("scoreInput").value = score;
+	document.getElementById("nameInput").style.display = "block";
+	document.getElementById("scoreSubmitButton").style.display = "block";
+	setGame();
+	}
+
+        function start() {
+
+            if (playing == 0) {
+
+                playing = 1;
+		score = 0;
+		carSoundFunction();
+		title.style.display = "none";
+		fuel = 5;
+                dodge1.style.display = "block";
+                dodge2.style.display = "block";
+                
+                window.addEventListener("keydown", carMoveStart, false);
+                window.addEventListener("keyup", carMoveStop, false);
+
+
+                function carMoveStart(e) {
+                    switch (e.keyCode) {
+                        case 40:
+                            //down
+                            moveDown = 1;
+                            break;
+                        case 38:
+                            //up
+                            moveUp = 1;
+                            break;
+                        case 90:
+                            //speedup
+                            speedUp = 1;
+                            break;
+
+                    }
+                }
+
+                function carMoveStop(e) {
+                    switch (e.keyCode) {
+                        case 40:
+                            //down
+                            moveDown = 0;
+                            break;
+                        case 38:
+                            //up
+                            moveUp = 0;
+                            break;
+                        case 90:
+                            //speedDown
+                            speedUp = 0;
+
+                    }
+                }
+
+
+
+
+            }
+
+
+        }
+
+        function enemies() {
+            setInterval(function() {
+
+                if (playing == 1) {
+
+                    //enemy1
+
+                    dodge1.style.top = dodge1y;
+                    dodge1.style.left = dodge1x;
+
+                    dodge1x = dodge1x - speed * .6;
+                    dodge1.style.left = dodge1x;
+
+			if(speed > 3){
+			dodge1.style.backgroundImage = "url('joshman.gif')";
+			}
+			else
+			{
+			dodge1.style.backgroundImage = "url('joshman.png')";
+			}
+
+                    if (dodge1x + 25 <= carx + 200 && dodge1x + 25 >= carx && dodge1y + 50 >= cary && dodge1y + 50 <= cary + 100) {
+                        //collide
+			
+                        dodge1hit = 1;
+                        setInterval(function() {
+                            if (dodge1hit == 1) {
+                                dodge1y = dodge1y - 6;
+                            }
+                        }, 20);
+			
+			if(playerScored == 0){
+			playerScored = 1;
+			fuel = fuel + 2;
+                      	score = score + 10;
+			enemiesHit = enemiesHit + 1;
+			maxSpeed = maxSpeed + .5;
+			scream.load();
+			scream.play();
+			}
+
+                    }
+
+                    if (dodge1x <= -1000) {
+
+                        dodge1y = Math.floor((Math.random() * 450) + 50);
+                        dodge1x = 1000;
+                        dodge1.style.display = "block";
+                        car.innerHTML = "wow ur score is: " + score;
+			playerScored = 0;
+			if(dodge1hit == 0){
+				if(fuel >= 10){
+				fuel = fuel - 10;
+				}
+				else if(fuel < 10){
+				fuel = 0;
+				}
+			}
+			dodge1hit = 0;
+                    }
+
+                    //enemy2
+
+                    dodge2.style.top = dodge2y;
+                    dodge2.style.left = dodge2x;
+
+                    dodge2x = dodge2x - speed * .6;
+                    dodge2.style.left = dodge2x;
+
+			if(speed > 3){
+			dodge2.style.backgroundImage = "url('joshman.gif')";
+			}
+			else
+			{
+			dodge2.style.backgroundImage = "url('joshman.png')";
+			}
+
+                    if (dodge2x + 25 <= carx + 200 && dodge2x + 25 >= carx && dodge2y + 50 >= cary && dodge2y + 50 <= cary + 100) {
+                        //collide
+                        dodge2hit = 1;
+			
+                        setInterval(function() {
+                            if (dodge2hit == 1) {
+                                dodge2y = dodge2y - 6;
+                            }
+                        }, 20);
+
+			if(playerScored == 0){
+			playerScored = 1;
+			fuel = fuel + 2;
+                      	score = score + 10;
+			enemiesHit = enemiesHit + 1;
+			maxSpeed = maxSpeed + .5;
+			scream.load();
+			scream.play();
+			}
+			
+
+
+                    }
+
+                    if (dodge2x <= -1000) {
+
+                        dodge2y = Math.floor((Math.random() * 450) + 50);
+                        dodge2x = 1000;  
+                        dodge2.style.display = "block";
+                        car.innerHTML = "wow ur score is: " + score;
+			playerScored = 0;
+			if(dodge2hit == 0){
+				if(fuel >= 10){
+				fuel = fuel - 10;
+				}
+				else if(fuel < 10){
+				fuel = 0;
+				}
+
+			}
+			dodge2hit = 0;
+                    }
+
+
+                }
+
+            }, 20);
+        }
+
+        function info() {
+
+            setInterval(function() {
+                if (playing == 1) {
+                    speedBox.innerHTML = Math.round(speed) + "\n fasts";
+		    fuelBox.innerHTML = fuel + " fuels";
+                }
+            }, 20);
+        }
+
+	function fuelDrain(){
+	
+	setInterval(function() {
+                if (playing == 1 && speed >= 5 && fuel >= 0) {
+                fuel = fuel - .9;	
+                }
+
+            }, 800);
+	
+	}
+	
+        function carMove() {
+            setInterval(function() {
+	
+		if(playing == 1){
+		
+                if (moveUp == 1 && cary > 50) {
+                    cary = cary - 10;
+                }
+
+                if (moveDown == 1 && cary < 450) {
+                    cary = cary + 10;
+                }
+
+                if (speedUp == 1 && speed <= maxSpeed && fuel > 0) {
+                    speed = speed + .1;
+                } else if (speedUp == 0 && speed > 0 || fuel <= 0 && speed > 0) {
+                    speed = speed - .1;
+                }
+	
+		if (speed <= 0 && fuel <=0 && gameEnding == 0){
+		gameEnding = 1;
+		endGame();
+		}
+
+		}	
+
+            }, 20);
+        }
+
+	function carSoundFunction(){
+		setInterval(function(){
+			if(playing == 1 && speed >= 2){
+				carSound.play();
+			}
+		}, 6000);
+	}
+
+
+        function roadfunction() {
+            setInterval(function() {
+
+                if (playing == 1) {
+
+
+
+                    car.style.top = cary;
+
+                    roadx = roadx - speed;
+                    roadimage.style.left = roadx;
+
+                    if (roadx <= -1000) {
+                        roadx = 0;
+                    }
+ 
+                }
+
+            }, 20);
+        }
+    </script>
+
+</body>
+
+</html>
